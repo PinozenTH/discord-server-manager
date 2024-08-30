@@ -1,4 +1,4 @@
-const { execute } = require("./events/ready");
+const { execute } = require("./ready");
 
 module.exports = {
     name: 'presenceUpdate',
