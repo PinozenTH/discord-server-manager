@@ -1,8 +1,8 @@
-const { EmbedBuilder, ActivityType } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
   name: 'guildMemberAdd',
-  execute: async function(member, client) {
+  execute: async function(member) {
     // Add the role to the new member
     const roleId = '977018045937619084';
     try {
@@ -28,19 +28,5 @@ module.exports = {
     if (channel) {
       channel.send({ embeds: [welcomeEmbed] });
     }
-    const guild = client.guilds.cache.get('749969091560734822');
-      if (guild) {
-        const memberCount = guild.memberCount;
-        client.user.setPresence({
-          activities: [{
-            name: `${memberCount} guests`,
-            type: ActivityType.Watching
-          }],
-          status: "idle"
-        });
-        console.log(`Set activity to Watching ${memberCount} Guest`);
-      } else {
-        console.log('Guild not found.');
-      }
   },
 };

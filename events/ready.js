@@ -1,7 +1,7 @@
 const { REST } = require('@discordjs/rest');
-const { Routes, SlashCommandBuilder, ActivityType } = require('discord.js');
+const { Routes, SlashCommandBuilder, ActivityType, Status, ActivityPlatform } = require('discord.js');
 
-let commands = [
+const commands = [
     new SlashCommandBuilder().setName('voice-hide').setDescription('Hide the voice channel'),
     new SlashCommandBuilder().setName('voice-reveal').setDescription('Reveal the voice channel'),
     new SlashCommandBuilder().setName('voice-lock').setDescription('Lock the voice channel'),
@@ -73,24 +73,26 @@ module.exports = {
 
       client.guilds.cache.forEach(guild => {
         console.log(`Connected to guild: ${guild.name}`);
-        if (guild.id !== '749969091560734822') {
+        if (guild.id !== guildId) {
           guild.leave();
           console.log(`Left guild: ${guild.name}`);
         }
       });
-      const guild = client.guilds.cache.get('749969091560734822');
+      const guild = client.guilds.cache.get(guildId);
       if (guild) {
         const memberCount = guild.memberCount;
+        let onlineMembers = guild.members.cache.filter(member => member.presence?.status === 'online').size;
+        let idleMembers = guild.members.cache.filter(member => member.presence?.status === 'idle').size;
+        let dndMembers = guild.members.cache.filter(member => member.presence?.status === 'dnd').size;
         client.user.setPresence({
           activities: [{
             name: `${memberCount} guests`,
-            type: ActivityType.Watching
+            type: ActivityType.Custom,
+            state: `${onlineMembers > 0 ? `🟢 ${onlineMembers}` : ''}${dndMembers > 0 ? ` ⛔ ${dndMembers}` : ''}${idleMembers > 0 ? ` 🌙 ${idleMembers}` : ''}`.trim(),
+            instance: false,
           }],
-          status: "idle"
+          status: 'idle'
         });
-        console.log(`Set activity to Watching ${memberCount} Guest`);
-      } else {
-        console.log('Guild not found.');
       }
     },
 };

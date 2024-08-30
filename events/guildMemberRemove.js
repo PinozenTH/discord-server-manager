@@ -1,8 +1,8 @@
-const { EmbedBuilder, ActivityType } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
   name: 'guildMemberRemove',
-  execute(member, client) {
+  execute(member) {
     const goodbyeEmbed = new EmbedBuilder()
       .setColor('#FF6347')
       .setTitle('Farewell!')
@@ -19,19 +19,5 @@ module.exports = {
     if (channel) {
       channel.send({ embeds: [goodbyeEmbed] });
     }
-    const guild = client.guilds.cache.get('749969091560734822');
-      if (guild) {
-        const memberCount = guild.memberCount;
-        client.user.setPresence({
-          activities: [{
-            name: `${memberCount} guests`,
-            type: ActivityType.Watching
-          }],
-          status: "idle"
-        });
-        console.log(`Set activity to Watching ${memberCount} Guest`);
-      } else {
-        console.log('Guild not found.');
-      }
   },
 };
