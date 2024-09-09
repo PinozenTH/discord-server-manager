@@ -5,5 +5,5 @@ services:
     volumes:
       - .:/app
     working_dir: /app
-    command: node index.js
+    command: npm run dev
     restart: always

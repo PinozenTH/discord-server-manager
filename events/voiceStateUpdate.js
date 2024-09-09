@@ -3,23 +3,18 @@ const { ChannelType } = require('discord.js');
 module.exports = {
   name: 'voiceStateUpdate',
   execute: async function(oldState, newState) {
-    let partyChannelId = '1276581461964619881';
-    let workingChannelId = '1277179177526890529';
-    let partyCategoryId = '1276554466849591327';
-    let workingCategoryId = '1277179398893736016';
+    let J2Create = '1281643449610928178'; // Channel ID to trigger the lofi song
+    let J2CreateCategoryId = '1277179398893736016'; // Category ID for voice channels
 
     // Check if the user joined the specific voice channel
     if (oldState.channelId !== newState.channelId) {
-      if (newState.channelId === partyChannelId) {
-        createVoiceChannel(partyCategoryId, newState, '🎉', 'Party');
-      } else if (newState.channelId === workingChannelId) {
-        createVoiceChannel(workingCategoryId, newState, '💪', 'Working Room');
+      if (newState.channelId === J2Create) {
+        createVoiceChannel(J2CreateCategoryId, newState, '', 'Room');
       }
     }
     if (oldState.channel) {
       if (oldState.channel.members.size === 0) {
-        removeVoiceChannel(partyCategoryId, oldState);
-        removeVoiceChannel(workingCategoryId, oldState);
+        removeVoiceChannel(J2CreateCategoryId, oldState);
       }
     }
   },
@@ -62,7 +57,7 @@ async function createVoiceChannel(categoryId, newState, channelEmoji, channelTyp
 async function removeVoiceChannel(categoryId, oldState) {
   const channel = oldState.channel;
   // Check if the channel is empty and in the specific category
-  if (channel.parentId === categoryId) {
+  if (channel.parentId === categoryId && channel.id !== '1282707750807408741') {
     try {
       // Log the channel ID before deletion
       console.log(`Attempting to delete channel with ID: ${channel.id}`);

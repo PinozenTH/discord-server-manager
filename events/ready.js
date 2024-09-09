@@ -1,5 +1,5 @@
 const { REST } = require('@discordjs/rest');
-const { Routes, SlashCommandBuilder, ActivityType, Status, ActivityPlatform } = require('discord.js');
+const { Routes, SlashCommandBuilder, ActivityType } = require('discord.js');
 
 const commands = [
     new SlashCommandBuilder().setName('voice-hide').setDescription('Hide the voice channel'),
@@ -47,6 +47,77 @@ const commands = [
         option.setName('user')
             .setDescription('The user to add into voice channel')
             .setRequired(true)),
+    new SlashCommandBuilder()
+        .setName('guests')
+        .setDescription('Real member count of ths server'),
+    new SlashCommandBuilder()
+        .setName('schedule')
+        .setDescription('Schedule an event')
+        .addStringOption(option =>
+            option.setName('name')
+                .setDescription('The name of the event')
+                .setRequired(true)
+        )
+        .addStringOption(option =>
+            option.setName('date')
+                .setDescription('The date of the event (eg. dd.mm, today, tommorrow, next week)')
+                .setRequired(true)
+        )
+        .addStringOption(option =>
+            option.setName('time')
+                .setDescription('The time of the event (eg. 00:00 => midnight) format 24hr')
+                .setRequired(true)
+        )
+        .addStringOption(option =>
+            option.setName('description')
+                .setDescription('A description of the event')
+                .setRequired(true)
+        )
+        .addChannelOption(option =>
+            option.setName('channel')
+                .setDescription('The channel where the event will be announced')
+                .setRequired(true)
+        )
+        .addUserOption(option =>
+            option.setName('members')
+                .setDescription('Members to add to the event')
+                .setRequired(false)
+        ),
+    // Music commands
+    // new SlashCommandBuilder()
+    //     .setName('join')
+    //     .setDescription('Join a voice channel'),
+    // new SlashCommandBuilder()
+    //     .setName('play')
+    //     .setDescription('Play a song')
+    //     .addStringOption(option =>
+    //         option.setName('url')
+    //             .setDescription('The YouTube URL of the song')
+    //             .setRequired(true)),
+    // new SlashCommandBuilder()
+    //     .setName('queue')
+    //     .setDescription('Queue a song')
+    //     .addStringOption(option =>
+    //         option.setName('url')
+    //             .setDescription('The YouTube URL of the song')
+    //             .setRequired(true)),
+    // new SlashCommandBuilder()
+    //     .setName('pause')
+    //     .setDescription('Pause the current song'),
+    // new SlashCommandBuilder()
+    //     .setName('leave')
+    //     .setDescription('Leave the voice channel'),
+    // new SlashCommandBuilder()
+    //     .setName('current-play')
+    //     .setDescription('Get the current playing song'),
+    // new SlashCommandBuilder()
+    //     .setName('search')
+    //     .setDescription('Search a song')
+    //     .addStringOption(option =>
+    //         option.setName('query')
+    //             .setDescription('The YouTube URL of the song')
+    //             .setRequired(true)),
+
 ]
 
 module.exports = {
@@ -81,9 +152,9 @@ module.exports = {
       const guild = client.guilds.cache.get(guildId);
       if (guild) {
         const memberCount = guild.memberCount;
-        let onlineMembers = guild.members.cache.filter(member => member.presence?.status === 'online').size;
-        let idleMembers = guild.members.cache.filter(member => member.presence?.status === 'idle').size;
-        let dndMembers = guild.members.cache.filter(member => member.presence?.status === 'dnd').size;
+        let onlineMembers = guild.members.cache.filter(member => member.presence?.status === 'online' && member.user.id !== client.user.id && !member.user.bot).size;
+        let idleMembers = guild.members.cache.filter(member => member.presence?.status === 'idle' && member.user.id !== client.user.id && !member.user.bot).size;
+        let dndMembers = guild.members.cache.filter(member => member.presence?.status === 'dnd' && member.user.id !== client.user.id && !member.user.bot).size;
         client.user.setPresence({
           activities: [{
             name: `${memberCount} guests`,
@@ -93,6 +164,21 @@ module.exports = {
           }],
           status: 'idle'
         });
+        
+        setInterval(() => {
+          let onlineMembers = guild.members.cache.filter(member => member.presence?.status === 'online' && member.user.id !== client.user.id && !member.user.bot).size;
+          let idleMembers = guild.members.cache.filter(member => member.presence?.status === 'idle' && member.user.id !== client.user.id && !member.user.bot).size;
+          let dndMembers = guild.members.cache.filter(member => member.presence?.status === 'dnd' && member.user.id !== client.user.id && !member.user.bot).size;
+          client.user.setPresence({
+            activities: [{
+              name: `${memberCount} guests`,
+              type: ActivityType.Custom,
+              state: `${onlineMembers > 0 ? `🟢 ${onlineMembers}` : ''}${dndMembers > 0 ? ` ⛔ ${dndMembers}` : ''}${idleMembers > 0 ? ` 🌙 ${idleMembers}` : ''}`.trim() || `${memberCount} Guests`,
+              instance: false,
+            }],
+            status: 'idle'
+          });
+        }, 1000);
       }
     },
 };
